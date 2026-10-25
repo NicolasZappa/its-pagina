@@ -1,0 +1,128 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'ITS y sus leyes — Salud sexual, derechos y prevención',
+	description =
+		'Información clara sobre infecciones de transmisión sexual (ITS), prevención y el marco legal argentino que garantiza tu atención gratuita: Ley 25.673, Ley 27.675 y Ley 27.610.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+		<header class="site-header">
+			<div class="container site-header__inner">
+				<a class="brand" href="/">ITS <span aria-hidden="true">&amp;</span> Leyes</a>
+				<nav class="site-nav" aria-label="Navegación principal">
+					<a href="#datos">Datos</a>
+					<a href="#its">ITS</a>
+					<a href="#mitos">Mitos</a>
+					<a href="#leyes">Leyes</a>
+					<a href="#aborto">Aborto</a>
+					<a href="#ayuda">Ayuda</a>
+					<a href="#juegos">Juegos</a>
+				</nav>
+			</div>
+		</header>
+
+		<main id="contenido">
+			<slot />
+		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<p class="site-footer__note">
+					Sitio informativo. No reemplaza una consulta médica: ante síntomas o un
+					contacto de riesgo, acudí a un efector de salud público.
+				</p>
+				<p class="site-footer__note">
+					<strong>Ley base:</strong> Ley 25.673 (Programa Nacional de Salud Sexual y
+					Procreación Responsable). <strong>Teniendo en cuenta:</strong> Ley 27.675
+					(respuesta integral para el VIH, hepatitis virales, otras ITS y TBC).
+				</p>
+			</div>
+		</footer>
+	</body>
+</html>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: color-mix(in srgb, var(--clr-surface) 88%, transparent);
+		backdrop-filter: blur(8px);
+		border-bottom: 1px solid var(--clr-border);
+	}
+
+	.site-header__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		padding-block: 0.8rem;
+	}
+
+	.brand {
+		font-weight: 800;
+		font-size: 1.15rem;
+		color: var(--clr-primary-dark);
+		text-decoration: none;
+	}
+
+	.site-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.1rem;
+	}
+
+	.site-nav a {
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: var(--clr-muted);
+		text-decoration: none;
+	}
+
+	.site-nav a:hover {
+		color: var(--clr-primary-dark);
+		text-decoration: underline;
+	}
+
+	.site-footer {
+		border-top: 1px solid var(--clr-border);
+		background: var(--clr-surface);
+		padding-block: 2rem;
+		font-size: 0.9rem;
+		color: var(--clr-muted);
+	}
+
+	.site-footer__note {
+		max-width: 75ch;
+		margin-bottom: 0.75em;
+	}
+
+	.site-footer__note:last-child {
+		margin-bottom: 0;
+	}
+</style>

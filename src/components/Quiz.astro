@@ -1,0 +1,297 @@
+---
+/**
+ * Quiz interactivo (JS vanilla, sin frameworks).
+ * Se pueden incluir varias instancias en la misma página:
+ * el script se ejecuta una vez e inicializa todos los [data-quiz].
+ */
+interface Question {
+	pregunta: string;
+	opciones: string[];
+	/** índice de la opción correcta */
+	respuesta: number;
+	/** explicación que se muestra al responder */
+	explicacion: string;
+}
+
+interface Props {
+	titulo: string;
+	intro?: string;
+	preguntas: Question[];
+}
+
+const { titulo, intro, preguntas } = Astro.props;
+const total = preguntas.length;
+---
+
+<section class="quiz" data-quiz aria-label={titulo}>
+	<h3 class="quiz__titulo">{titulo}</h3>
+	{intro && <p class="quiz__intro">{intro}</p>}
+
+	<div class="quiz__head" data-quiz-head>
+		<p class="quiz__paso" data-quiz-paso aria-live="polite">
+			Pregunta <span data-quiz-actual>1</span> de {total}
+		</p>
+		<div class="quiz__barra" aria-hidden="true">
+			<span data-quiz-barra style={`width: ${Math.round(100 / total)}%`}></span>
+		</div>
+	</div>
+
+	<ol class="quiz__lista" data-quiz-lista>
+		{
+			preguntas.map((q, i) => (
+				<li
+					class="quiz__item"
+					data-pregunta
+					data-respuesta={q.respuesta}
+					hidden={i > 0}
+				>
+					<p class="quiz__enunciado">{q.pregunta}</p>
+					<div class="quiz__opciones" role="group" aria-label={`Opciones para: ${q.pregunta}`}>
+						{q.opciones.map((opcion, j) => (
+							<button type="button" class="quiz__opcion" data-opcion={j}>
+								{opcion}
+							</button>
+						))}
+					</div>
+					<p class="quiz__feedback" data-feedback role="status" hidden>
+						{q.explicacion}
+					</p>
+				</li>
+			))
+		}
+	</ol>
+
+	<div class="quiz__pie" data-quiz-pie>
+		<button type="button" class="btn btn--primary" data-quiz-siguiente disabled>
+			Siguiente
+		</button>
+	</div>
+
+	<div class="quiz__resultado" data-quiz-resultado hidden>
+		<p class="quiz__puntaje" data-quiz-puntaje aria-live="polite"></p>
+		<button type="button" class="btn btn--ghost" data-quiz-reiniciar>
+			Jugar de nuevo
+		</button>
+	</div>
+</section>
+
+<script>
+	document.querySelectorAll<HTMLElement>('[data-quiz]').forEach((root) => {
+		const items = Array.from(root.querySelectorAll<HTMLElement>('[data-pregunta]'));
+		const pasoEl = root.querySelector<HTMLElement>('[data-quiz-actual]');
+		const barraEl = root.querySelector<HTMLElement>('[data-quiz-barra]');
+		const headEl = root.querySelector<HTMLElement>('[data-quiz-head]');
+		const listaEl = root.querySelector<HTMLElement>('[data-quiz-lista]');
+		const pieEl = root.querySelector<HTMLElement>('[data-quiz-pie]');
+		const siguienteBtn = root.querySelector<HTMLButtonElement>('[data-quiz-siguiente]');
+		const resultadoEl = root.querySelector<HTMLElement>('[data-quiz-resultado]');
+		const puntajeEl = root.querySelector<HTMLElement>('[data-quiz-puntaje]');
+		const reiniciarBtn = root.querySelector<HTMLButtonElement>('[data-quiz-reiniciar]');
+
+		if (!items.length || !siguienteBtn || !resultadoEl || !puntajeEl) return;
+
+		const total = items.length;
+		let actual = 0;
+		let puntaje = 0;
+
+		function mostrar(index: number) {
+			items.forEach((item, i) => (item.hidden = i !== index));
+			if (pasoEl) pasoEl.textContent = String(index + 1);
+			if (barraEl) barraEl.style.width = `${Math.round(((index + 1) / total) * 100)}%`;
+			const item = items[index];
+			const respondida = item?.dataset.respondida === '1';
+			siguienteBtn.disabled = !respondida;
+			siguienteBtn.textContent = index === total - 1 ? 'Ver resultado' : 'Siguiente';
+		}
+
+		items.forEach((item, index) => {
+			const correcta = Number(item.dataset.respuesta ?? 0);
+			const feedback = item.querySelector<HTMLElement>('[data-feedback]');
+			const botones = Array.from(item.querySelectorAll<HTMLButtonElement>('[data-opcion]'));
+
+			botones.forEach((btn) => {
+				btn.addEventListener('click', () => {
+					if (item.dataset.respondida === '1') return;
+					item.dataset.respondida = '1';
+
+					const elegida = Number(btn.dataset.opcion);
+					const esCorrecta = elegida === correcta;
+					if (esCorrecta) puntaje += 1;
+
+					botones.forEach((b, j) => {
+						b.disabled = true;
+						if (j === correcta) b.classList.add('es-correcta');
+						if (j === elegida && !esCorrecta) b.classList.add('es-incorrecta');
+					});
+
+					if (feedback) {
+						feedback.hidden = false;
+						feedback.classList.add(esCorrecta ? 'es-correcta' : 'es-incorrecta');
+					}
+					siguienteBtn.disabled = false;
+				});
+			});
+
+			// evitar que el índice se confunda al reiniciar
+			void index;
+		});
+
+		siguienteBtn.addEventListener('click', () => {
+			if (actual < total - 1) {
+				actual += 1;
+				mostrar(actual);
+			} else {
+				listaEl?.setAttribute('hidden', '');
+				headEl?.setAttribute('hidden', '');
+				pieEl?.setAttribute('hidden', '');
+				resultadoEl.removeAttribute('hidden');
+
+				const pct = Math.round((puntaje / total) * 100);
+				let mensaje = '¡Excelente! Seguís al día con la información.';
+				if (pct < 60) mensaje = 'Vale la pena repasar la sección y volver a intentarlo.';
+				else if (pct < 100) mensaje = '¡Muy bien! Casi perfecto.';
+				puntajeEl.textContent = `Respuestas correctas: ${puntaje} de ${total}. ${mensaje}`;
+			}
+		});
+
+		reiniciarBtn?.addEventListener('click', () => {
+			puntaje = 0;
+			actual = 0;
+			items.forEach((item) => {
+				delete item.dataset.respondida;
+				item.querySelectorAll<HTMLElement>('.quiz__opcion').forEach((btn) => {
+					btn.disabled = false;
+					btn.classList.remove('es-correcta', 'es-incorrecta');
+				});
+				const feedback = item.querySelector<HTMLElement>('[data-feedback]');
+				if (feedback) feedback.hidden = true;
+			});
+			resultadoEl.setAttribute('hidden', '');
+			listaEl?.removeAttribute('hidden');
+			headEl?.removeAttribute('hidden');
+			pieEl?.removeAttribute('hidden');
+			mostrar(0);
+		});
+
+		mostrar(0);
+	});
+</script>
+
+<style>
+	.quiz {
+		background: var(--clr-surface);
+		border: 1px solid var(--clr-border);
+		border-radius: var(--radius);
+		padding: 1.5rem;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.quiz__titulo {
+		font-size: 1.2rem;
+		margin: 0 0 0.25em;
+	}
+
+	.quiz__intro {
+		color: var(--clr-muted);
+		font-size: 0.95rem;
+		margin-bottom: 1.25rem;
+	}
+
+	.quiz__paso {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--clr-muted);
+		margin-bottom: 0.4rem;
+	}
+
+	.quiz__barra {
+		height: 6px;
+		border-radius: 999px;
+		background: var(--clr-border);
+		overflow: hidden;
+		margin-bottom: 1.25rem;
+	}
+
+	.quiz__barra span {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background: var(--clr-primary);
+		transition: width 0.25s ease;
+	}
+
+	.quiz__lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.quiz__enunciado {
+		font-weight: 600;
+		margin-bottom: 0.9rem;
+	}
+
+	.quiz__opciones {
+		display: grid;
+		gap: 0.6rem;
+	}
+
+	.quiz__opcion {
+		font: inherit;
+		text-align: left;
+		padding: 0.7em 1em;
+		border-radius: var(--radius-sm);
+		border: 1.5px solid var(--clr-border);
+		background: var(--clr-bg);
+		cursor: pointer;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+	}
+
+	.quiz__opcion:hover:not(:disabled) {
+		border-color: var(--clr-primary);
+	}
+
+	.quiz__opcion:disabled {
+		cursor: default;
+		opacity: 0.85;
+	}
+
+	.quiz__opcion.es-correcta {
+		border-color: var(--clr-primary);
+		background: var(--clr-primary-soft);
+		font-weight: 600;
+	}
+
+	.quiz__opcion.es-incorrecta {
+		border-color: var(--clr-accent);
+		background: var(--clr-accent-soft);
+	}
+
+	.quiz__feedback {
+		margin-top: 0.9rem;
+		padding: 0.7em 1em;
+		border-radius: var(--radius-sm);
+		font-size: 0.95rem;
+		background: var(--clr-primary-soft);
+		border-left: 4px solid var(--clr-primary);
+	}
+
+	.quiz__feedback.es-incorrecta {
+		background: var(--clr-accent-soft);
+		border-left-color: var(--clr-accent);
+	}
+
+	.quiz__pie {
+		margin-top: 1.25rem;
+	}
+
+	.quiz__resultado {
+		text-align: center;
+		padding-block: 0.5rem;
+	}
+
+	.quiz__puntaje {
+		font-weight: 600;
+		margin-bottom: 1rem;
+	}
+</style>

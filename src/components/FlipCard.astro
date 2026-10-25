@@ -1,0 +1,134 @@
+---
+interface Props {
+	mito: string;
+	realidad: string;
+}
+
+const { mito, realidad } = Astro.props;
+---
+
+<button type="button" class="flip" data-flip aria-pressed="false">
+	<span class="flip__inner">
+		<span class="flip__face flip__face--mito" data-cara="mito">
+			<span class="flip__etiqueta">Mito</span>
+			<span class="flip__texto">{mito}</span>
+			<span class="flip__pista">Tocá para ver la realidad ↻</span>
+		</span>
+		<span class="flip__face flip__face--realidad" data-cara="realidad" aria-hidden="true">
+			<span class="flip__etiqueta">Realidad</span>
+			<span class="flip__texto">{realidad}</span>
+			<span class="flip__pista">Tocá para volver ↻</span>
+		</span>
+	</span>
+</button>
+
+<script>
+	document.querySelectorAll<HTMLButtonElement>('[data-flip]').forEach((card) => {
+		if (card.dataset.flipReady === '1') return;
+		card.dataset.flipReady = '1';
+
+		const mitoCara = card.querySelector<HTMLElement>('[data-cara="mito"]');
+		const realidadCara = card.querySelector<HTMLElement>('[data-cara="realidad"]');
+
+		const aplicar = (volteada: boolean) => {
+			card.setAttribute('aria-pressed', String(volteada));
+			mitoCara?.setAttribute('aria-hidden', String(volteada));
+			realidadCara?.setAttribute('aria-hidden', String(!volteada));
+		};
+
+		aplicar(false);
+		card.addEventListener('click', () => {
+			aplicar(card.getAttribute('aria-pressed') !== 'true');
+		});
+	});
+</script>
+
+<style>
+	.flip {
+		display: block;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: none;
+		font: inherit;
+		color: inherit;
+		text-align: left;
+		cursor: pointer;
+		perspective: 1200px;
+		border-radius: var(--radius);
+	}
+
+	.flip:focus-visible {
+		outline: 3px solid var(--clr-primary);
+		outline-offset: 3px;
+		border-radius: var(--radius);
+	}
+
+	.flip__inner {
+		display: grid;
+		height: 100%;
+		transform-style: preserve-3d;
+		transition: transform 0.55s cubic-bezier(0.3, 0.8, 0.3, 1);
+	}
+
+	.flip[aria-pressed='true'] .flip__inner {
+		transform: rotateY(180deg);
+	}
+
+	.flip__face {
+		grid-area: 1 / 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		padding: 1.35rem;
+		border-radius: var(--radius);
+		border: 1px solid var(--clr-border);
+		background: var(--clr-surface);
+		box-shadow: var(--shadow-sm);
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+	}
+
+	.flip__face--realidad {
+		transform: rotateY(180deg);
+		background: var(--clr-primary-soft);
+		border-color: color-mix(in srgb, var(--clr-primary) 35%, var(--clr-border));
+	}
+
+	.flip__etiqueta {
+		align-self: flex-start;
+		font-size: 0.72rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		padding: 0.2em 0.7em;
+		border-radius: 999px;
+		background: var(--clr-accent-soft);
+		color: var(--clr-accent);
+	}
+
+	.flip__face--realidad .flip__etiqueta {
+		background: var(--clr-primary);
+		color: #fff;
+	}
+
+	.flip__texto {
+		font-weight: 600;
+		line-height: 1.45;
+	}
+
+	.flip__pista {
+		margin-top: auto;
+		padding-top: 0.5rem;
+		font-size: 0.8rem;
+		color: var(--clr-muted);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.flip__inner {
+			transition: none;
+		}
+	}
+</style>

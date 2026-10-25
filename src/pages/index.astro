@@ -1,0 +1,742 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Quiz from '../components/Quiz.astro';
+import ItsCard from '../components/ItsCard.astro';
+import FlipCard from '../components/FlipCard.astro';
+
+const datos = [
+	{ cifra: '376M', texto: 'infecciones nuevas de ITS al año en el mundo' },
+	{ cifra: '1,2M', texto: 'casos nuevos de VIH al año' },
+	{ cifra: '50–97%', texto: 'de las ITS no muestran síntomas' },
+	{ cifra: '90%', texto: 'de los casos de VPH se resuelven solos' },
+];
+
+const its = [
+	{
+		titulo: 'Qué son',
+		texto:
+			'Son infecciones que se transmiten principalmente por contacto sexual —por vía vaginal, anal u oral— y, en algunos casos, por contacto sanguíneo o de madre a hijo. La mayoría se trata y muchas se previenen.',
+	},
+	{
+		titulo: 'Síntomas',
+		texto:
+			'Pueden no dar ningún síntoma: se estima que entre el 50% y el 97% de las ITS son asintomáticas. Cuando aparecen, pueden ser ardor al orinar, flujo inusual, úlceras o lesiones en genitales/boca, dolor o sarpullido. Ante cualquier señal, hacete el test.',
+	},
+	{
+		titulo: 'Prevención',
+		texto:
+			'El uso correcto y constante del preservativo es la medida más eficaz. Sumar tests periódicos, la vacunación contra VPH y hepatitis B, y la educación sexual integral reducen aún más el riesgo.',
+	},
+	{
+		titulo: 'Curables y controlables',
+		texto:
+			'Sífilis, gonorrea, clamidia y tricomonas son curables con tratamiento. VIH, hepatitis B, herpes y VPH no se curan, pero se controlan con medicación: con VIH, una carga viral indetectable no transmite.',
+	},
+];
+
+const itsDetalle = [
+	{
+		nombre: 'Sífilis',
+		estado: 'Curable',
+		sintomas:
+			'Úlcera indolora que aparece y desaparece; luego sarpullido, fiebre y ganglios. Puede pasar desapercibida.',
+		transmision: 'Sexo vaginal, anal u oral; también de madre a hijo.',
+		nota: 'Se cura con antibióticos (penicilina).',
+	},
+	{
+		nombre: 'Gonorrea',
+		estado: 'Curable',
+		sintomas: 'Ardor al orinar y flujo purulento; muchas veces no da síntomas.',
+		transmision: 'Sexo vaginal, anal u oral; de madre a hijo en el parto.',
+		nota: 'Se cura con antibióticos: hay que completar el tratamiento.',
+	},
+	{
+		nombre: 'Clamidia',
+		estado: 'Curable',
+		sintomas: 'Flujo, ardor al orinar o dolor abdominal; suele ser asintomática.',
+		transmision: 'Sexo vaginal, anal u oral.',
+		nota: 'Si no se trata, puede afectar la fertilidad.',
+	},
+	{
+		nombre: 'Tricomoniasis',
+		estado: 'Curable',
+		sintomas: 'Flujo amarillento o verdoso con olor, picazón y ardor al orinar.',
+		transmision: 'Principalmente contacto genital (vaginal); rara vez por sexo oral.',
+		nota: 'Se cura con antibióticos; conviene tratar también a la pareja.',
+	},
+	{
+		nombre: 'VIH',
+		estado: 'Controlable',
+		sintomas: 'Fase inicial tipo gripe; después puede pasar años sin síntomas.',
+		transmision: 'Sangre, semen y fluidos sexuales, leche materna y agujas compartidas.',
+		nota: 'Con tratamiento y carga viral indetectable, no se transmite.',
+	},
+	{
+		nombre: 'Hepatitis B',
+		estado: 'Controlable',
+		sintomas: 'Cansancio, náuseas, dolor abdominal e ictericia; puede ser asintomática.',
+		transmision: 'Sangre, fluidos sexuales y de madre a hijo.',
+		nota: 'Hay vacuna y tratamiento para la forma crónica.',
+	},
+	{
+		nombre: 'Herpes (VHS)',
+		estado: 'Controlable',
+		sintomas: 'Ampollas o úlceras dolorosas en genitales o boca; van y vienen.',
+		transmision: 'Contacto piel a piel y sexo oral; puede transmitirse sin lesiones visibles.',
+		nota: 'Los brotes se controlan con medicación.',
+	},
+	{
+		nombre: 'VPH',
+		estado: 'Se resuelve solo',
+		sintomas: 'Muchas veces sin síntomas; puede causar verrugas genitales.',
+		transmision: 'Contacto sexual piel a piel (vaginal, anal u oral).',
+		nota: 'El 90% se resuelve solo; hay vacuna y controles (PAP/VPH).',
+	},
+];
+
+const mitos = [
+	{
+		mito: 'Si no tengo síntomas, no tengo una ITS.',
+		realidad:
+			'Entre el 50% y el 97% de las ITS son asintomáticas. La única forma de saberlo es con un test: no esperes señales.',
+	},
+	{
+		mito: 'Solo se contagian las personas con muchas parejas sexuales.',
+		realidad:
+			'Cualquier persona que tenga relaciones sexuales sin protección puede contagiarse. Basta una sola relación sin preservativo.',
+	},
+	{
+		mito: 'El sexo oral no transmite ITS.',
+		realidad:
+			'Sí las transmite: herpes, gonorrea, clamidia, sífilis y VPH pueden pasar por sexo oral. Usá preservativo también ahí.',
+	},
+	{
+		mito: 'El VIH se contagia por saliva, abrazos o compartir un vaso.',
+		realidad:
+			'No. Se transmite por sangre, semen y fluidos sexuales, leche materna y agujas compartidas. Con tratamiento indetectable no transmite.',
+	},
+	{
+		mito: 'El VPH siempre termina en cáncer.',
+		realidad:
+			'No: el 90% de las infecciones por VPH se resuelven solas. La vacuna y los controles periódicos reducen el riesgo de complicaciones.',
+	},
+	{
+		mito: 'La pastilla del día después protege de las ITS.',
+		realidad:
+			'No. Solo previene un embarazo; no protege de ninguna ITS. Para eso hace falta preservativo y tests periódicos.',
+	},
+];
+
+const transmision = [
+	{
+		titulo: 'Genitales',
+		texto:
+			'Contacto sexual vaginal o anal: es la vía principal de la mayoría de las ITS.',
+	},
+	{
+		titulo: 'Sexo oral',
+		texto:
+			'Puede transmitir herpes, gonorrea, clamidia, sífilis y VPH. El preservativo también se usa en el sexo oral.',
+	},
+	{
+		titulo: 'Saliva / boca',
+		texto:
+			'Algunas infecciones, como el herpes oral y el VPH, pueden pasar por contacto de boca o saliva. La mayoría de las ITS no se contagian con un simple beso.',
+	},
+];
+
+const leyes = [
+	{
+		nombre: 'Ley 25.673 — Salud Sexual y Procreación Responsable',
+		texto:
+			'Sancionada en 2002, es la ley marco en la materia. Creó el Programa Nacional que obliga a hospitales públicos, obras sociales y prepagas a entregar gratuitamente métodos anticonceptivos (preservativos, pastillas, DIU, anticoncepción de emergencia, etc.). Busca prevenir embarazos no intencionales y enfermedades de transmisión sexual.',
+		link: 'https://www.argentina.gob.ar/justicia/derechofacil/leysimple/salud-sexual',
+		linkTexto: 'Ver en argentina.gob.ar',
+	},
+	{
+		nombre: 'Ley 26.150 — Educación Sexual Integral (ESI)',
+		texto:
+			'Sancionada en 2006, garantiza el derecho de todos los estudiantes —desde el nivel inicial hasta el secundario, en escuelas públicas y privadas— a recibir educación sexual integral, abordando prevención, cuidado del cuerpo, derechos y afectividad de manera científica y adaptada a cada edad.',
+		link: 'http://www.legisalud.gov.ar/atlas/categorias/salud_reproductiva.html',
+		linkTexto: 'Ver recurso',
+	},
+	{
+		nombre: 'Ley 26.130 — Contracepción Quirúrgica',
+		texto:
+			'Garantiza que toda persona mayor de edad pueda acceder de forma gratuita a la ligadura de trompas o a la vasectomía en el sistema de salud. Solo se requiere consentimiento informado: no hace falta autorización judicial ni el aval de una pareja.',
+		link: 'https://www.argentina.gob.ar/justicia/derechofacil/leysimple/anticoncepcion-quirurgica',
+		linkTexto: 'Ver en argentina.gob.ar',
+	},
+];
+
+const quizIts = [
+	{
+		pregunta: '¿Cuántas infecciones nuevas de ITS se estiman cada año en el mundo?',
+		opciones: ['37,6 millones', '1,2 millones', '376 millones', '90 millones'],
+		respuesta: 2,
+		explicacion:
+			'Son 376 millones de infecciones nuevas al año, mucho más de lo que se suele imaginar.',
+	},
+	{
+		pregunta: 'Según los datos, ¿qué porcentaje de las ITS puede no dar síntomas?',
+		opciones: ['Ninguna, todas dan síntomas', 'Entre 50% y 97%', 'Un 10%', 'Solo en hombres'],
+		respuesta: 1,
+		explicacion:
+			'Entre el 50% y el 97% de las ITS son asintomáticas: no esperes señales para hacerte el test.',
+	},
+	{
+		pregunta: '¿Cuál de estas ITS es curable?',
+		opciones: ['VIH', 'Herpes', 'Sífilis', 'VPH'],
+		respuesta: 2,
+		explicacion:
+			'La sífilis se cura con antibióticos. VIH, herpes y VPH no se curan, pero se controlan.',
+	},
+	{
+		pregunta: '¿Qué porcentaje de infecciones por VPH se resuelven solas?',
+		opciones: ['Un 50%', 'Un 75%', 'Un 90%', 'Ninguna'],
+		respuesta: 2,
+		explicacion:
+			'El 90% de los casos de VPH se resuelven solos; aun así, el seguimiento médico es importante.',
+	},
+	{
+		pregunta: '¿Cuál es la forma más eficaz de prevenir el contagio de ITS?',
+		opciones: [
+			'Usar preservativo de forma correcta y constante',
+			'Usar doble preservativo a la vez',
+			'Tomar vitamina C después del sexo',
+			'Verificar que la persona no tenga síntomas a simple vista',
+		],
+		respuesta: 0,
+		explicacion:
+			'El preservativo usado bien, desde el inicio y en todo el acto, es la medida más eficaz. El doble preservativo genera fricción y se rompe.',
+	},
+];
+
+const quizQueHarías = [
+	{
+		pregunta:
+			'Conocés a alguien hace poco y propone no usar preservativo porque "no hay riesgo". ¿Qué hacés?',
+		opciones: [
+			'Aceptás, si ambos se ven sanos',
+			'Le proponen hacerse los dos las pruebas de ITS y, hasta tener resultados, usar preservativo',
+			'Lo dejan porque no confían el uno en el otro',
+			'Usan preservativo solo si hay síntomas',
+		],
+		respuesta: 1,
+		explicacion:
+			'Ante la duda, tests para ambos y preservativo hasta tener resultados: la confianza no descarta infecciones asintomáticas.',
+	},
+	{
+		pregunta:
+			'Tu pareja fue diagnosticada con una ITS curable y está en tratamiento. ¿Cómo acompañás?',
+		opciones: [
+			'Le piden que no diga nada a nadie',
+			'Le sugieren no tener relaciones hasta terminar el tratamiento y controlarse los dos',
+			'Vos tomás antibióticos "por las dudas"',
+			'Como es curable, siguen como si nada',
+		],
+		respuesta: 1,
+		explicacion:
+			'Completar el tratamiento, abstenerse hasta el alta y que ambas personas se controlen evita la ping-pong de contagios.',
+	},
+	{
+		pregunta:
+			'Tuviste una relación sin preservativo y no tenés ningún síntoma. ¿Qué hacés?',
+		opciones: [
+			'Nada: sin síntomas no hay problema',
+			'Esperás a ver si aparece algo raro',
+			'Te hacés el test y, mientras esperan los resultados, usás preservativo',
+			'Te lavás con productos especiales',
+		],
+		respuesta: 2,
+		explicacion:
+			'Lavarse no previene ITS y la ausencia de síntomas no descarta nada: el test es la respuesta.',
+	},
+	{
+		pregunta:
+			'Un amigo te cuenta que tiene VIH y tiene miedo de que lo traten distinto. ¿Qué hacés?',
+		opciones: [
+			'Le decís que no lo toque nada porque "se contagia de todo"',
+			'Lo acompañás, aprendés que con tratamiento no se transmite y se lo aclarás',
+			'Lo alejás del grupo "por las dudas"',
+			'Le pedís que no salga con nadie nunca más',
+		],
+		respuesta: 1,
+		explicacion:
+			'El VIH no se transmite con un abrazo, ni por saliva ni por compartir objetos. Con tratamiento y carga viral indetectable no se transmite.',
+	},
+];
+
+const quizLeyes = [
+	{
+		pregunta: '¿Qué ley creó el Programa Nacional de Salud Sexual y Procreación Responsable?',
+		opciones: ['Ley 26.150', 'Ley 25.673', 'Ley 27.610', 'Ley 27.675'],
+		respuesta: 1,
+		explicacion:
+			'La Ley 25.673 (2002) es la ley marco: garantiza métodos anticonceptivos gratuitos en el sistema público, obras sociales y prepagas.',
+	},
+	{
+		pregunta:
+			'¿Cuáles son los requisitos principales para acceder a la interrupción voluntaria del embarazo (IVE)?',
+		opciones: [
+			'Ser mayor de 18 años y tener autorización judicial',
+			'Ser mayor de 16 años y que el embarazo no supere las 14 semanas',
+			'Ser casada y con autorización de la pareja',
+			'No hay requisitos: es un derecho sin condiciones',
+		],
+		respuesta: 1,
+		explicacion:
+			'La Ley 27.610 garantiza el acceso hasta la semana 14 inclusive de gestación para mayores de 16 años, sin necesidad de autorización judicial.',
+	},
+	{
+		pregunta:
+			'¿Qué establece la Ley 27.610 sobre la información a terceros?',
+		opciones: [
+			'Se debe avisar a la familia siempre',
+			'Los profesionales están obligados a informar a la pareja',
+			'El acceso es confidencial: no se informa a terceros sin autorización',
+			'Se registra en un padrón público',
+		],
+		respuesta: 2,
+		explicacion:
+			'La confidencialidad es un derecho: los equipos de salud no pueden informar a terceros sin tu autorización expresa.',
+	},
+	{
+		pregunta: '¿Qué garantiza la Ley 26.130?',
+		opciones: [
+			'Preservativos gratuitos en hospitales',
+			'Acceso gratuito a la contracepción quirúrgica (ligadura de trompas y vasectomía) por consentimiento informado',
+			'Educación sexual en las escuelas',
+			'Atención gratuita de las ITS',
+		],
+		respuesta: 1,
+		explicacion:
+			'Mayores de edad pueden acceder a ligadura o vasectomía gratuitas solo con consentimiento informado: no hace falta autorización judicial ni de la pareja.',
+	},
+	{
+		pregunta: 'La Ley 27.675 (en la que se basa este sitio) ¿qué abarca?',
+		opciones: [
+			'Solo el VIH',
+			'Solo las hepatitis virales',
+			'VIH, hepatitis virales, otras ITS y tuberculosis (TBC)',
+			'Solo la educación sexual',
+		],
+		respuesta: 2,
+		explicacion:
+			'La Ley 27.675 establece una respuesta integral, universal, gratuita y basada en derechos humanos para el VIH, las hepatitis virales, otras ITS y la TBC.',
+	},
+];
+---
+
+<Layout>
+	<!-- ============ HERO ============ -->
+	<section class="hero">
+		<div class="container hero__grid">
+			<div>
+				<h1>Conocé tus derechos sobre las <em>ITS</em></h1>
+				<p class="hero__lead">
+					Información clara sobre infecciones de transmisión sexual, cómo prevenirlas
+					y el marco legal argentino que garantiza tu atención y tu autonomía.
+				</p>
+				<p class="hero__acciones">
+					<a class="btn btn--primary" href="#its">Qué son las ITS</a>
+					<a class="btn btn--ghost" href="#ayuda">Dónde buscar ayuda</a>
+				</p>
+			</div>
+			<aside class="hero__leyes card">
+				<h2 class="hero__leyes-titulo">Leyes clave</h2>
+				<ul>
+					<li><strong>25.673</strong> — Salud sexual y procreación responsable</li>
+					<li><strong>27.610</strong> — Interrupción legal del embarazo (IVE/ILE)</li>
+					<li><strong>26.150</strong> — Educación sexual integral (ESI)</li>
+					<li><strong>26.130</strong> — Contracepción quirúrgica</li>
+					<li><strong>27.675</strong> — Respuesta integral VIH, hepatitis, ITS y TBC</li>
+				</ul>
+			</aside>
+		</div>
+	</section>
+
+	<!-- ============ DATOS ============ -->
+	<section id="datos" class="section section--alt" aria-labelledby="datos-titulo">
+		<div class="container">
+			<h2 id="datos-titulo" class="section-title">Datos que conviene conocer</h2>
+			<p class="section-lead">
+				Las ITS afectan a mucha más gente de lo que se cree, y muchas veces sin
+				síntomas. Conocer los números ayuda a bajar el estigma y a cuidarse.
+			</p>
+			<ul class="grid datos__lista">
+				{
+					datos.map((d) => (
+						<li class="card datos__item">
+							<p class="datos__cifra">{d.cifra}</p>
+							<p class="datos__texto">{d.texto}</p>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<!-- ============ ITS ============ -->
+	<section id="its" class="section" aria-labelledby="its-titulo">
+		<div class="container">
+			<h2 id="its-titulo" class="section-title">Todo sobre las ITS</h2>
+			<p class="section-lead">
+				Qué son, cómo se manifiestan, cómo se previenen y cuáles se pueden curar.
+			</p>
+			<div class="grid">
+				{
+					its.map((item) => (
+						<article class="card">
+							<h3>{item.titulo}</h3>
+							<p>{item.texto}</p>
+						</article>
+					))
+				}
+			</div>
+
+			<h3 class="subtitulo">ITS una por una</h3>
+			<p class="section-lead">
+				Lo esencial de cada infección: cómo se manifiesta, si se cura o se controla y
+				por dónde se transmite.
+			</p>
+			<div class="grid its__grid">
+				{
+					itsDetalle.map((item) => (
+						<ItsCard
+							nombre={item.nombre}
+							estado={item.estado as 'Curable' | 'Controlable' | 'Se resuelve solo'}
+							sintomas={item.sintomas}
+							transmision={item.transmision}
+							nota={item.nota}
+						/>
+					))
+				}
+			</div>
+
+			<h3 class="subtitulo">¿Cómo se pueden transmitir?</h3>
+			<div class="grid">
+				{
+					transmision.map((item) => (
+						<article class="card card--borde">
+							<h4>{item.titulo}</h4>
+							<p>{item.texto}</p>
+						</article>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- ============ MITOS ============ -->
+	<section id="mitos" class="section section--alt" aria-labelledby="mitos-titulo">
+		<div class="container">
+			<h2 id="mitos-titulo" class="section-title">Mitos vs. realidad</h2>
+			<p class="section-lead">
+				Tocá cada tarjeta para descubrir qué hay de cierto. Lo que se repite no
+				siempre es verdad.
+			</p>
+			<div class="grid mitos__grid">
+				{
+					mitos.map((item) => (
+						<FlipCard mito={item.mito} realidad={item.realidad} />
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- ============ LEYES ============ -->
+	<section id="leyes" class="section" aria-labelledby="leyes-titulo">
+		<div class="container">
+			<h2 id="leyes-titulo" class="section-title">Marco legal</h2>
+			<p class="section-lead">
+				Leyes que garantizan tu salud sexual y reproductiva de forma gratuita en todo
+				el país.
+			</p>
+			<div class="grid">
+				{
+					leyes.map((ley) => (
+						<article class="card card--ley">
+							<h3>{ley.nombre}</h3>
+							<p>{ley.texto}</p>
+							<p>
+								<a href={ley.link} target="_blank" rel="noopener noreferrer">
+									{ley.linkTexto} ↗
+								</a>
+							</p>
+						</article>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- ============ ABORTO ============ -->
+	<section id="aborto" class="section section--alt" aria-labelledby="aborto-titulo">
+		<div class="container">
+			<h2 id="aborto-titulo" class="section-title">Aborto: Ley 27.610</h2>
+			<p class="section-lead">
+				Desde 2021, la interrupción del embarazo es un derecho en Argentina. Estas son
+				las situaciones que cubre la ley.
+			</p>
+			<div class="grid">
+				<article class="card card--ley">
+					<h3>IVE — Interrupción Voluntaria del Embarazo</h3>
+					<p>
+						Es el derecho a interrumpir el embarazo de manera voluntaria, dentro de los
+						<b>límites que establece la ley</b>, sin necesidad de causa judicial y de
+						forma gratuita en el sistema de salud.
+					</p>
+				</article>
+				<article class="card card--ley">
+					<h3>ILE — Interrupción Legal del Embarazo</h3>
+					<p>
+						Aplica cuando hay un <b>riesgo para la vida o la integridad física</b> de la
+						persona gestante, o cuando el embarazo proviene de una situación de
+						violación. También es gratuita y sin trámites judiciales.
+					</p>
+				</article>
+				<article class="card card--derechos">
+					<h3>Los derechos</h3>
+					<ul>
+						<li>Acceso gratuito y con consentimiento informado.</li>
+						<li>Confidencialidad: nadie entera sin tu autorización.</li>
+						<li>Autonomía: la decisión es tuya.</li>
+						<li>Atención sin discriminación, también para migrantes.</li>
+					</ul>
+				</article>
+				<article class="card card--derechos">
+					<h3>Los requisitos</h3>
+					<ul>
+						<li><b>Edad:</b> mayores de 16 años acceden sin autorización de terceros.</li>
+						<li>
+							<b>Semanas:</b> hasta la semana 14 inclusive de gestación para la IVE.
+						</li>
+						<li>La ILE no tiene ese límite de semanas.</li>
+					</ul>
+				</article>
+			</div>
+		</div>
+	</section>
+
+	<!-- ============ AYUDA ============ -->
+	<section id="ayuda" class="section section--ayuda" aria-labelledby="ayuda-titulo">
+		<div class="container">
+			<h2 id="ayuda-titulo" class="section-title">¿Dónde buscar ayuda?</h2>
+			<p class="section-lead">
+				Dos canales gratuitos y confidenciales para orientarte sobre recursos de salud
+				en toda la provincia.
+			</p>
+			<div class="grid">
+				<article class="card card--contacto">
+					<h3>WhatsApp del Programa Provincial</h3>
+					<p class="contacto__numero">351-7048222</p>
+					<p>
+						Programa Provincial de VIH, ITS y Hepatitis Virales. Atienden de lunes a
+						viernes en horario matutino y responden sobre los recursos disponibles en
+						toda la provincia.
+					</p>
+				</article>
+				<article class="card card--contacto">
+					<h3>Línea Nacional de Salud Sexual</h3>
+					<p class="contacto__numero"><a href="tel:080022272583">0800-222-72583</a></p>
+					<p>
+						Gratuita y confidencial. Si les decís en qué pueblo o ciudad del interior
+						de Córdoba estás, buscan en su base de datos los efectores públicos,
+						organizaciones o profesionales activos de esa zona para darte una
+						respuesta local exacta.
+					</p>
+				</article>
+			</div>
+		</div>
+	</section>
+
+	<!-- ============ JUEGOS ============ -->
+	<section id="juegos" class="section section--alt" aria-labelledby="juegos-titulo">
+		<div class="container">
+			<h2 id="juegos-titulo" class="section-title">Juegos interactivos</h2>
+			<p class="section-lead">
+				Poné a prueba lo que sabés: quizzes sobre ITS, situaciones de la vida real y
+				sobre leyes y aborto.
+			</p>
+			<div class="grid juegos__grid">
+				<Quiz titulo="Quiz: ¿Cuánto sabés de ITS?" preguntas={quizIts} />
+				<Quiz
+					titulo="¿Qué harías vos?"
+					intro="Situaciones cotidianas. No hay trampas fáciles."
+					preguntas={quizQueHarías}
+				/>
+				<Quiz titulo="Quiz: Leyes y aborto" preguntas={quizLeyes} />
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* ---------- Hero ---------- */
+	.hero {
+		background:
+			radial-gradient(60rem 30rem at 110% -10%, var(--clr-law-soft), transparent 60%),
+			radial-gradient(50rem 25rem at -10% 110%, var(--clr-primary-soft), transparent 60%),
+			var(--clr-surface);
+		border-bottom: 1px solid var(--clr-border);
+		padding-block: clamp(3.5rem, 9vw, 6.5rem);
+	}
+
+	.hero__grid {
+		display: grid;
+		gap: 2.5rem;
+		align-items: center;
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 60rem) {
+		.hero__grid {
+			grid-template-columns: 3fr 2fr;
+		}
+	}
+
+	.hero h1 {
+		font-size: clamp(2.1rem, 5.5vw, 3.4rem);
+		margin: 0.6em 0 0.4em;
+	}
+
+	.hero h1 em {
+		font-style: normal;
+		color: var(--clr-primary-dark);
+	}
+
+	.hero__lead {
+		font-size: 1.15rem;
+		color: var(--clr-muted);
+		max-width: 48ch;
+	}
+
+	.hero__acciones {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+		margin-top: 1.5rem;
+	}
+
+	.hero__leyes ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.6rem;
+		font-size: 0.95rem;
+	}
+
+	.hero__leyes-titulo {
+		font-size: 1rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--clr-law);
+	}
+
+	/* ---------- Datos ---------- */
+	.datos__lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.datos__item {
+		text-align: center;
+	}
+
+	.datos__cifra {
+		font-size: clamp(2rem, 4vw, 2.8rem);
+		font-weight: 800;
+		color: var(--clr-primary-dark);
+		margin-bottom: 0.2em;
+	}
+
+	.datos__texto {
+		color: var(--clr-muted);
+		margin-bottom: 0;
+	}
+
+	/* ---------- ITS ---------- */
+	.subtitulo {
+		font-size: 1.3rem;
+		margin: 2.5rem 0 1.25rem;
+	}
+
+	.card--borde {
+		background: var(--clr-bg);
+	}
+
+	.its__grid {
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	}
+
+	/* ---------- Mitos ---------- */
+	.mitos__grid {
+		grid-template-columns: 1fr;
+		grid-auto-rows: 1fr;
+	}
+
+	@media (min-width: 45rem) {
+		.mitos__grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.mitos__grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	/* ---------- Leyes / aborto ---------- */
+	.card--ley h3 {
+		color: var(--clr-law);
+	}
+
+	.card--derechos ul {
+		margin: 0;
+		padding-left: 1.2em;
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	/* ---------- Ayuda ---------- */
+	.section--ayuda {
+		background: var(--clr-accent-soft);
+	}
+
+	.card--contacto {
+		border-color: color-mix(in srgb, var(--clr-accent) 35%, var(--clr-border));
+	}
+
+	.contacto__numero {
+		font-size: 1.8rem;
+		font-weight: 800;
+		color: var(--clr-accent);
+		margin-bottom: 0.4em;
+	}
+
+	.contacto__numero a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.contacto__numero a:hover {
+		text-decoration: underline;
+	}
+
+	/* ---------- Juegos ---------- */
+	.juegos__grid {
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 60rem) {
+		.juegos__grid {
+			grid-template-columns: repeat(3, 1fr);
+			align-items: start;
+		}
+	}
+</style>

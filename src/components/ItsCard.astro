@@ -1,0 +1,109 @@
+---
+interface Props {
+	nombre: string;
+	estado: 'Curable' | 'Controlable' | 'Se resuelve solo';
+	sintomas: string;
+	transmision: string;
+	nota?: string;
+}
+
+const { nombre, estado, sintomas, transmision, nota } = Astro.props;
+
+const tipo =
+	estado === 'Curable' ? 'curable' : estado === 'Controlable' ? 'controlable' : 'resuelve';
+---
+
+<article class="its-card card">
+	<header class="its-card__head">
+		<h4>{nombre}</h4>
+		<span class:list={['its-card__estado', `its-card__estado--${tipo}`]}>{estado}</span>
+	</header>
+
+	<dl class="its-card__datos">
+		<div>
+			<dt>Síntomas</dt>
+			<dd>{sintomas}</dd>
+		</div>
+		<div>
+			<dt>Se transmite por</dt>
+			<dd>{transmision}</dd>
+		</div>
+	</dl>
+
+	{nota && <p class="its-card__nota">{nota}</p>}
+</article>
+
+<style>
+	.its-card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+		padding: 1.25rem;
+	}
+
+	.its-card__head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.its-card__head h4 {
+		font-size: 1.1rem;
+		margin: 0;
+	}
+
+	.its-card__estado {
+		flex-shrink: 0;
+		font-size: 0.72rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		padding: 0.25em 0.7em;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+
+	.its-card__estado--curable {
+		background: #e3f5ea;
+		color: #166b45;
+	}
+
+	.its-card__estado--controlable {
+		background: var(--clr-law-soft);
+		color: var(--clr-law);
+	}
+
+	.its-card__estado--resuelve {
+		background: var(--clr-primary-soft);
+		color: var(--clr-primary-dark);
+	}
+
+	.its-card__datos {
+		margin: 0;
+		display: grid;
+		gap: 0.7rem;
+		font-size: 0.93rem;
+	}
+
+	.its-card__datos dt {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--clr-muted);
+		margin-bottom: 0.15em;
+	}
+
+	.its-card__datos dd {
+		margin: 0;
+	}
+
+	.its-card__nota {
+		margin: auto 0 0;
+		padding-top: 0.9rem;
+		border-top: 1px dashed var(--clr-border);
+		font-size: 0.88rem;
+		color: var(--clr-primary-dark);
+	}
+</style>
